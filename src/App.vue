@@ -359,7 +359,7 @@ function prevExercise() {
       :key="set.set">
       <div class="cell border-right">{{ set.weight }}</div>
       <div class="cell border-right">{{ set.reps }}</div>
-      <div class="cell border-right text-align-left"> <span class="chip" :class="{
+      <div class="cell border-right text-align-left flex"> <span class="chip" :class="{
         'chip--45': plate == 45,
         'chip--35': plate == 35,
         'chip--25': plate == 25,
@@ -367,7 +367,7 @@ function prevExercise() {
         'chip--5': plate == 5,
         'chip--2_5': plate == 2.5
       }" v-for="(plate, index) in set.plates" :key="index">{{ plate }}</span></div>
-      <div class="cell bg-darker"><input style="transform:scale(2)" type="checkbox" v-model="set.done"></div>
+      <div class="cell bg-darker cbox"><input style="transform:scale(2.5) translateY(-3px)" type="checkbox" v-model="set.done" class="cbox"></div>
     </div>
   </div>
   <div class="card">
