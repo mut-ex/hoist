@@ -417,7 +417,7 @@ function prevExercise() {
     </div>
 
     <h2 class="big-button" @click="show_reset_menu = !show_reset_menu">Clear Done</h2>
-    <div class="wrapper" :class="{ closed: show_reset_menu, open: !show_reset_menu }">
+    <div class="wrapper" :class="{ closed: !show_reset_menu, open: show_reset_menu }">
       <div class="button-group">
         <h4 class="small-button" @click="clearDoneThis">This Lift</h4>
         <h4 class="small-button" @click="clearDoneToday(current_day)">Today's Lifts</h4>
