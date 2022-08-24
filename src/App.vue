@@ -2,12 +2,13 @@
 import { ref, reactive } from 'vue'
 
 
-function round_mul5(val) {
+function roundMul5(val) {
   return Math.round(val / 5) * 5
 }
 
 
-var current_state = reactive({ day: 0, exercise: 0 })
+var current_exercise = ref(0)
+var current_day = ref(0)
 
 /*
   Day 1 / Monday
@@ -182,31 +183,30 @@ var day5CloseGripBenchPress = ref([
 
 
 var days = ref([
-
   {
-    name: "Mon", exercises: [
+    name: "Mon", routines: [
       { name: "Bench Press", sets: day1BenchPress },
       { name: "Bent Over Row", sets: day1BentOverRow },
       { name: "Over Head Press", sets: day1OverHeadPress }]
   },
   {
-    name: "Tue", exercises: [
+    name: "Tue", routines: [
       { name: "Squat", sets: day2Squat },
       { name: "Sumo Deadlift", sets: day2SumoDeadlift }],
   },
   {
-    name: "Wed", exercises: [
+    name: "Wed", routines: [
       { name: "Over Head Press", sets: day3OverHeadPress },
       { name: "Bent Over Row", sets: day3BentOverRow },
       { name: "Incline Bench", sets: day3InclineBench }],
   },
   {
-    name: "Thu", exercises: [
+    name: "Thu", routines: [
       { name: "Deadlift", sets: day4Deadlift },
       { name: "Front Squat", sets: day4FrontSquat }],
   },
   {
-    name: "Fri", exercises: [
+    name: "Fri", routines: [
       { name: "Bench Press", sets: day5BenchPress },
       { name: "Bent Over Row", sets: day5BentOverRow },
       { name: "C.G. Bench Press", sets: day5CloseGripBenchPress }],
@@ -214,25 +214,21 @@ var days = ref([
 ])
 
 var base_exercises = ref([
-  { id: 0, name: "Bench Press", TM: 170, sets: [day1BenchPress, day3InclineBench, day5BenchPress, day5CloseGripBenchPress] },
-  { id: 1, name: "Deadlift", TM: 270, sets: [day2SumoDeadlift, day4Deadlift] },
-  { id: 2, name: "Over Head Press", TM: 95, sets: [day1OverHeadPress, day3OverHeadPress] },
-  { id: 3, name: "Row", TM: 180, sets: [day1BentOverRow, day3BentOverRow, day5BentOverRow] },
-  { id: 4, name: "Squat", TM: 165, sets: [day2Squat, day4FrontSquat] }
+  { name: "Bench Press", training_max: 170, sets: [day1BenchPress, day3InclineBench, day5BenchPress, day5CloseGripBenchPress] },
+  { name: "Deadlift", training_max: 270, sets: [day2SumoDeadlift, day4Deadlift] },
+  { name: "Over Head Press", training_max: 95, sets: [day1OverHeadPress, day3OverHeadPress] },
+  { name: "Row", training_max: 180, sets: [day1BentOverRow, day3BentOverRow, day5BentOverRow] },
+  { name: "Squat", training_max: 165, sets: [day2Squat, day4FrontSquat] }
 ])
 
 base_exercises.value.forEach((exercise) => {
   exercise.sets.forEach((sets) => {
     sets.value.forEach((set) => {
-      set.weight = round_mul5(set.multiplier * exercise.TM);
+      set.weight = roundMul5(set.multiplier * exercise.training_max);
       set.plates = getPlates(set.weight);
     })
   })
 })
-
-function round_mul10(val) {
-  return Math.round(val / 10) * 10
-}
 
 function getPlate(weight) {
   if (weight < 2.5) {
@@ -273,83 +269,93 @@ function getPlates(weight) {
 }
 
 function onChange(e) {
-  e.target.value = round_mul5(e.target.value)
+  e.target.value = roundMul5(e.target.value)
   var exercise = base_exercises.value[e.target.id]
-  exercise.TM = e.target.value
+  exercise.training_max = e.target.value
   exercise.sets.forEach((sets) => {
     sets.value.forEach((set) => {
-      set.weight = round_mul5(set.multiplier * exercise.TM);
+      set.weight = roundMul5(set.multiplier * exercise.training_max);
       set.plates = getPlates(set.weight);
     })
   })
 }
 
-const show_tm = ref(false)
+const show_training_max = ref(false)
 function toggle() {
-  show_tm.value = !show_tm.value
+  show_training_max.value = !show_training_max.value
 }
 
-function select_day(i) {
-  if (current_state.day == i) {
+function selectDay(i) {
+  if (current_day.value == i) {
     return
   }
-  current_state.day = i
-  current_state.exercise = 0
+  current_day.value = i
+  current_exercise.value = 0
+  no_more_left.value = true
+  no_more_right.value = false
 }
 
-function next_exercise() {
-  var i = current_state.exercise
-  var total = days.value[current_state.day].exercises.length
+const no_more_right = ref(false)
+const no_more_left = ref(true)
+
+
+function nextExercise() {
+  var total = days.value[current_day.value].routines.length
+  var i = current_exercise.value
   if (i < total - 1) {
-    current_state.exercise = current_state.exercise + 1
-  } else {
-    return
+    current_exercise.value = current_exercise.value + 1
+  }
+  if (i == total - 2) {
+    no_more_right.value = true
+  }
+  if (i >= 0) {
+    no_more_left.value = false
   }
 }
 
-function prev_exercise() {
-  var i = current_state.exercise
-  if (i >= 1) {
-    current_state.exercise = current_state.exercise - 1
-  } else {
-    return
+function prevExercise() {
+  var total = days.value[current_day.value].routines.length
+  var i = current_exercise.value
+  if (i > 0) {
+    current_exercise.value = current_exercise.value - 1
+  }
+  if (i == 1) {
+    no_more_left.value = true
+  }
+  if (i <= total - 1) {
+    no_more_right.value = false
   }
 }
 </script>
 
 <template>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+
   <div class="card">
-    <h2 class="big-button" @click="toggle">Training Max (TM) </h2>
-    <div class="wrapper" :class="{ closed: !show_tm, open: show_tm }">
-      <div class="card-content " v-for="(exercise, index) in base_exercises" :key="index">
-        <div>{{ exercise.name }}</div>
-        <input type="number" :value="exercise.TM" :id="index" @change="onChange" @focus="$event.target.select()">
-      </div>
+    <div class="tab-container">
+      <div class="tab" v-for="(day, index) in days" :key="index" :class="{ tab_selected: current_day == index }"
+        @click="selectDay(index)">{{ day.name }}</div>
     </div>
-  <div class="ribbon">
-    <div class="tab" v-for="(day, index) in days" :key="index" :class="{ tab_selected: current_state.day == index }"
-      @click="select_day(index)">{{ day.name }}</div>
-  </div>
   </div>
 
-  <div class="horizontal-scroll__container">
-    <div class="horizontal-scroll__button" @click="prev_exercise"><img src="./assets/chevron_left.svg" alt="Previous" class="chevron_svg">
-    </div>
-    <div class="horizontal-scroll__item">{{ days[current_state.day].exercises[current_state.exercise].name }}</div>
-    <div class="horizontal-scroll__button" @click="next_exercise"><img src="./assets/chevron_right.svg" alt="Next" class="chevron_svg">
-    </div>
-  </div>
   <div class="table-container">
+    <div class="horizontal-scroll__container">
+      <div class="horizontal-scroll__button" @click="prevExercise" :class="{ hide: no_more_left }"><img
+          src="./assets/chevron_left.svg" alt="Previous" class="chevron_svg">
+      </div>
+      <div class="horizontal-scroll__item">{{ days[current_day].routines[current_exercise].name }}</div>
+      <div class="horizontal-scroll__button" @click="nextExercise" :class="{ hide: no_more_right }"><img
+          src="./assets/chevron_right.svg" alt="Next" class="chevron_svg">
+      </div>
+    </div>
     <div class="row row-heading">
       <div class="cell cell-heading">Weight</div>
       <div class="cell cell-heading">Reps</div>
       <div class="cell cell-heading">Plates</div>
       <div class="cell cell-heading">Done</div>
     </div>
-    <div class="row" :class="{ done: set.done }"
-      v-for="set in days[current_state.day].exercises[current_state.exercise].sets" :key="set.set">
-
+    <div class="row" :class="{ done: set.done }" v-for="set in days[current_day].routines[current_exercise].sets"
+      :key="set.set">
       <div class="cell">{{ set.weight }}</div>
       <div class="cell">{{ set.reps }}</div>
       <div class="cell text-align-left"> <span :class="{
@@ -359,31 +365,30 @@ function prev_exercise() {
         chip_10: plate == 10,
         chip_5: plate == 5,
         chip_2_5: plate == 2.5
-      }" v-for="(plate, index) in set.plates" :key="index">{{ String(plate) == "2.5" ? "2½" : plate }}</span></div>
+      }" v-for="(plate, index) in set.plates" :key="index">{{ plate }}</span></div>
       <div class="cell"><input style="transform:scale(2)" type="checkbox" v-model="set.done"></div>
     </div>
   </div>
-
+  <div class="card">
+    <h2 class="big-button" @click="toggle">Training Max</h2>
+    <div class="wrapper" :class="{ closed: !show_training_max, open: show_training_max }">
+      <div class="card-content " v-for="(exercise, index) in base_exercises" :key="index">
+        <div>{{ exercise.name }}</div>
+        <input type="number" :value="exercise.training_max" :id="index" @change="onChange"
+          @focus="$event.target.select()">
+      </div>
+    </div>
+  </div>
 </template>
 
 
 <style>
+.hide {
+  visibility: hidden;
+}
+
 .done {
   opacity: 0.25;
   transition: opacity 0.25s;
-}
-
-.slide-fade-enter-active {
-  transition: all 0.3s ease-out;
-}
-
-.slide-fade-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
-}
-
-.slide-fade-enter-from,
-.slide-fade-leave-to {
-  transform: translateY(-20px);
-  opacity: 0;
 }
 </style>
