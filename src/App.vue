@@ -330,49 +330,50 @@ function prevExercise() {
 
 <template>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-
+  <div class="logo"><img src="./assets/hoist_logo.svg" alt="Hoist">
+  </div>
   <div class="card">
-    <div class="tab-container">
-      <div class="tab" v-for="(day, index) in days" :key="index" :class="{ tab_selected: current_day == index }"
+    <div class="tab__container">
+      <div class="tab" v-for="(day, index) in days" :key="index" :class="{ 'tab--selected': current_day == index }"
         @click="selectDay(index)">{{ day.name }}</div>
     </div>
   </div>
 
-  <div class="table-container">
-    <div class="horizontal-scroll__container">
-      <div class="horizontal-scroll__button" @click="prevExercise" :class="{ hide: no_more_left }"><img
-          src="./assets/chevron_left.svg" alt="Previous" class="chevron_svg">
-      </div>
-      <div class="horizontal-scroll__item">{{ days[current_day].routines[current_exercise].name }}</div>
-      <div class="horizontal-scroll__button" @click="nextExercise" :class="{ hide: no_more_right }"><img
-          src="./assets/chevron_right.svg" alt="Next" class="chevron_svg">
-      </div>
+  <div class="horizontal-scroll__container">
+    <div class="horizontal-scroll__button" @click="prevExercise" :class="{ hide: no_more_left }"><img
+        src="./assets/chevron_left.svg" alt="Previous" class="horizontal-scroll__button__svg">
     </div>
-    <div class="row row-heading">
-      <div class="cell cell-heading">Weight</div>
-      <div class="cell cell-heading">Reps</div>
-      <div class="cell cell-heading">Plates</div>
-      <div class="cell cell-heading">Done</div>
+    <div class="horizontal-scroll__item">{{ days[current_day].routines[current_exercise].name }}</div>
+    <div class="horizontal-scroll__button" @click="nextExercise" :class="{ hide: no_more_right }"><img
+        src="./assets/chevron_right.svg" alt="Next" class="horizontal-scroll__button__svg">
+    </div>
+  </div>
+  <div class="table__container">
+    <div class="row row--heading">
+      <div class="cell border-right--darker">Weight</div>
+      <div class="cell border-right--darker">Reps</div>
+      <div class="cell border-right--darker">Plates</div>
+      <div class="cell">Done</div>
     </div>
     <div class="row" :class="{ done: set.done }" v-for="set in days[current_day].routines[current_exercise].sets"
       :key="set.set">
-      <div class="cell">{{ set.weight }}</div>
-      <div class="cell">{{ set.reps }}</div>
-      <div class="cell text-align-left"> <span :class="{
-        chip_45: plate == 45,
-        chip_35: plate == 35,
-        chip_25: plate == 25,
-        chip_10: plate == 10,
-        chip_5: plate == 5,
-        chip_2_5: plate == 2.5
+      <div class="cell border-right">{{ set.weight }}</div>
+      <div class="cell border-right">{{ set.reps }}</div>
+      <div class="cell border-right text-align-left"> <span class="chip" :class="{
+        'chip--45': plate == 45,
+        'chip--35': plate == 35,
+        'chip--25': plate == 25,
+        'chip--10': plate == 10,
+        'chip--5': plate == 5,
+        'chip--2_5': plate == 2.5
       }" v-for="(plate, index) in set.plates" :key="index">{{ plate }}</span></div>
-      <div class="cell"><input style="transform:scale(2)" type="checkbox" v-model="set.done"></div>
+      <div class="cell bg-darker"><input style="transform:scale(2)" type="checkbox" v-model="set.done"></div>
     </div>
   </div>
   <div class="card">
     <h2 class="big-button" @click="toggle">Training Max</h2>
     <div class="wrapper" :class="{ closed: !show_training_max, open: show_training_max }">
-      <div class="card-content " v-for="(exercise, index) in base_exercises" :key="index">
+      <div class="card__content " v-for="(exercise, index) in base_exercises" :key="index">
         <div>{{ exercise.name }}</div>
         <input type="number" :value="exercise.training_max" :id="index" @change="onChange"
           @focus="$event.target.select()">
