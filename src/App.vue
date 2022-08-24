@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import VueCookies from 'vue-cookies'
 import DaySelector from './components/DaySelector.vue'
 import ExerciseSelector from './components/ExerciseSelector.vue'
 
@@ -216,11 +215,11 @@ var days = ref([
 ])
 
 var base_exercises = ref([
-  { name: "Bench Press", training_max: $cookies.isKey('Bench Press') ? $cookies.get('Bench Press') : 170, sets: [day1BenchPress, day3InclineBench, day5BenchPress, day5CloseGripBenchPress] },
-  { name: "Deadlift", training_max: $cookies.isKey('Deadlift') ? $cookies.get('Deadlift') : 270, sets: [day2SumoDeadlift, day4Deadlift] },
-  { name: "Over Head Press", training_max: $cookies.isKey('Over Head Press') ? $cookies.get('Over Head Press') : 95, sets: [day1OverHeadPress, day3OverHeadPress] },
-  { name: "Row", training_max: $cookies.isKey('Row') ? $cookies.get('Row') : 180, sets: [day1BentOverRow, day3BentOverRow, day5BentOverRow] },
-  { name: "Squat", training_max: $cookies.isKey('Squat') ? $cookies.get('Squat') : 165, sets: [day2Squat, day4FrontSquat] }
+  { name: "Bench Press", training_max: localStorage.getItem('Bench Press') || 170, sets: [day1BenchPress, day3InclineBench, day5BenchPress, day5CloseGripBenchPress] },
+  { name: "Deadlift", training_max: localStorage.getItem('Deadlift') || 270, sets: [day2SumoDeadlift, day4Deadlift] },
+  { name: "Over Head Press", training_max: localStorage.getItem('Over Head Press') || 95, sets: [day1OverHeadPress, day3OverHeadPress] },
+  { name: "Row", training_max: localStorage.getItem('Row') || 180, sets: [day1BentOverRow, day3BentOverRow, day5BentOverRow] },
+  { name: "Squat", training_max: localStorage.getItem('Squat') || 165, sets: [day2Squat, day4FrontSquat] }
 ])
 
 base_exercises.value.forEach((exercise) => {
@@ -274,7 +273,7 @@ function onChange(e) {
   e.target.value = roundMul5(e.target.value)
   var exercise = base_exercises.value[e.target.id]
   exercise.training_max = e.target.value
-  $cookies.set(exercise.name, exercise.training_max, '365d');
+  localStorage.setItem(exercise.name, exercise.training_max)
   exercise.sets.forEach((sets) => {
     sets.value.forEach((set) => {
       set.weight = roundMul5(set.multiplier * exercise.training_max);
