@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   pwa: {
-    name: 'My App',
+    name: 'Hoist',
     themeColor: '#f27059',
     msTileColor: '#343a40',
     appleMobileWebAppCapable: 'yes',
