@@ -4,7 +4,7 @@ module.exports = defineConfig({
   pwa: {
     name: 'Hoist',
     themeColor: '#f27059',
-    msTileColor: '#343a40',
+    msTileColor: '#f0f1f2',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
 
